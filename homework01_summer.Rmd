@@ -1,6 +1,6 @@
 ---
 title: 'DS 2020 - Summer 2026 - Homework #1'
-author: "Your Name"
+author: "Fioni Thakker"
 output: html_document
 ---
 
@@ -20,15 +20,15 @@ Describe your experience: make a note of each step. In case you run into a probl
 
 > please write your experience below
 
-### example
+My experience:
 
-#### Step 12.2
+I already have a fair share of experience with Git, so this assignment was mostly a basic refresher for me. However, it was still good to practice the workflow and get the hang of things again!
 
-Will's note: xxx
+Step 1: I opened my terminal and initialized Git tracking locally in my project folder.
 
-#### Step 12.3
+Step 2: I linked my local directory to my existing repository hosted on GitHub.
 
-Will's note: xxx
+Step 3: I successfully practiced the workflow cycle by tracking files, committing the updates locally, syncing changes, and pushing them to the cloud. Everything works smoothly!
 
 ## part 2
 
@@ -38,7 +38,7 @@ Create a new file or add any types of file into your local repository and practi
 
 paste the URL of your public repo here
 
-> paste it here:
+> paste it here: <https://github.com/fionithakker28/ds2020-fioni>
 
 # ggplot2 Homework Assignment
 
@@ -51,31 +51,43 @@ paste the URL of your public repo here
 ```{r, message = FALSE}
 # install.packages("mclust")
 library(mclust) # if this throws an error of the form 'there is no package called mcmclust', uncomment the line above, run it once, then comment the line out again and run the code chunk again.
+library(ggplot2)
 data(banknote)
 ```
 
 3.  Use one of our object inspecting functions and interpret the result in the data that you see.
 
 ```{r}
-
+str(banknote)
 ```
 
 4.  Use the package `ggplot2` to draw a barchart of `Status`. Map `Status` to the fill color of the barchart.
 
 ```{r}
-
+ggplot(data = banknote, aes(x = Status, fill = Status)) +
+  geom_bar() +
+  labs(title = "Count of Real vs Fake Banknotes", 
+       y = "Number of Banknotes")
 ```
 
 5.  Use the package `ggplot2` to draw a histogram of one of the variables in the dataset that shows a distinction between genuine and counterfeit banknotes. Use fill color to show this difference. Choose the binwidth such that there are no gaps in the middle range of the histogram.
 
 ```{r}
-
+ggplot(data = banknote, aes(x = Bottom, fill = Status)) +
+  geom_histogram(binwidth = 0.3, position = "identity", alpha = 0.6) +
+  labs(title = "Histogram of Bottom Margin Width", 
+       x = "Bottom Margin", 
+       y = "Count")
 ```
 
 6.  Use the package `ggplot2` to draw a scatterplot of two (continuous) measurements, color by `Status`. Find a pair of measurements that allow you to separate perfectly between genuine and counterfeit banknotes.
 
 ```{r}
-
+ggplot(data = banknote, aes(x = Diagonal, y = Top, color = Status)) +
+  geom_point() +
+  labs(title = "Banknote Separation by Diagonal and Top Margin", 
+       x = "Diagonal Length", 
+       y = "Top Margin Width")
 ```
 
 7.  For each of the three figures above, write a three sentence summary, describing the
