@@ -91,7 +91,12 @@ ggplot(data = banknote, aes(x = Diagonal, y = Top, color = Status)) +
 ```
 
 7.  For each of the three figures above, write a three sentence summary, describing the
+
     a.  **structure of the plot**: what type of plot is it? Which variables are mapped to x, to y, and to the (fill) color?
+
+- **Figure 1 (Bar Chart):** This is a simple bar chart. The x-axis shows if the banknote is counterfeit or genuine, the y-axis shows the count of notes, and the bars are filled with different colors based on the status.
+- **Figure 2 (Histogram):** This is a histogram. The x-axis shows the bottom margin measurements, the y-axis shows the count, and the bars use two different colors to separate the real and fake notes.
+- **Figure 3 (Scatterplot):** This is a scatterplot. The x-axis shows the diagonal length, the y-axis shows the top margin width, and the dots are colored red for counterfeit and blue for genuine notes.
 
 ```{r}
   
@@ -99,11 +104,19 @@ ggplot(data = banknote, aes(x = Diagonal, y = Top, color = Status)) +
 
 b.  **main message of the plot**: what is your main finding, i.e. what do you want viewers to learn from the plot?
 
+- **Figure 1 (Bar Chart):** The main message is that the dataset is perfectly balanced. It shows we have exactly 100 counterfeit notes and 100 genuine notes.
+- **Figure 2 (Histogram):** The main finding is that counterfeit notes generally have a much larger bottom margin measurement than genuine notes.
+- **Figure 3 (Scatterplot):** The main takeaway is that these two measurements separate the notes perfectly. The fake notes stay in one clean group on the left, and the real notes form a completely separate group on the right.
+
 ```{r}
 
 ```
 
 c.  **additional message**: point out anomalies or outliers, if there are any.
+
+- **Figure 1 (Bar Chart):** There are no anomalies here because both bars are exactly the same height.
+- **Figure 2 (Histogram):** There is a small area in the middle where the real and fake notes mix together a little bit, but they still form two separate hills.
+- **Figure 3 (Scatterplot):** There is one major anomaly where a single blue dot (a real note) is sitting completely inside the red group of fake notes. There is also another blue dot that sits way lower than the rest of its group.
 
 ```{r}
 
