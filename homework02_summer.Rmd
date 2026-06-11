@@ -1,0 +1,183 @@
+---
+title: 'DS 2020 - Summer 2026 - Homework #2'
+author: "Fioni Thakker"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Lab: Ames Housing Data Exploration
+
+## Overview
+
+In this lab, you will explore the `ames` dataset from the `classdata` package, which contains residential sales data in Ames, Iowa since 2017. All work should be completed in this `.Rmd` file and submitted through Canvas.
+
+The main variable of interest is `Sale_Price`. You will:
+
+- Investigate this variable and its distribution
+- Identify and explore one other variable that may relate to `Sale_Price`
+- Use code, visualizations, and written explanation to communicate your findings
+
+Make sure your `.Rmd` file knits cleanly to `.html`. You will submit both the `.Rmd` and the knitted output.
+
+## Step 1: Data Exploration
+
+1.  Inspect the first few lines of the data set:
+    - What variables are there?
+    - Of what type are the variables?
+    - What does each variable mean?
+    - What do you expect their data ranges to be?
+
+```{r}
+library(classdata)
+library(ggplot2)
+library(dplyr)
+str(ames)
+```
+
+> Answer: The dataset has 16 columns like Address, Sale Date, Style, Sale Price,Bedrooms, Acres and YearBuilt. The columns are mixed with text, categories, and numbers. Sale Price means the cost of the home in dollars, and YearBuilt means the year it was built. I expect prices to go from 0 to 1 million dollars, and years to go from 1900 to today.
+
+2.  Begin the exploration with the main variable, `Sale_Price`:
+    - What is the range of this variable?
+    - Create a histogram to visualize the distribution.
+    - What is the general pattern? Are there any unusual or extreme values?
+    
+```{r}
+summary(ames$`Sale Price`)
+
+ggplot(data = ames, aes(x = `Sale Price`)) +
+  geom_histogram(binwidth = 50000, fill = "blue", color = "black") +
+  labs(title = "Distribution of House Sale Prices in Ames",
+       x = "Sale Price ($)",
+       y = "Count of Homes")
+```
+
+> Answer: The sale prices range from 0 dollars to a maximum of 20,500,000 dollars. Most of the houses are clustered on the left side with a median price of 170,900 dollars. The pattern is heavily right-skewed with extreme outlier values on the far right side above 20 million dollars. Having multiple homes listed at 0 dollars is also highly unusual.
+
+3.  Choose a second variable that may relate to `Sale_Price`:
+    - What is the range of this variable? Plot it and describe the pattern.
+    - Explore the relationship between this variable and `Sale_Price`. Use a scatterplot, boxplot, or faceted bar chart—whichever is most appropriate.
+    - Describe the pattern. Does this second variable help explain anything you observed in `Sale_Price`?
+
+```{r}
+summary(ames$YearBuilt)
+
+ggplot(data = ames, aes(x = YearBuilt)) +
+  geom_histogram(binwidth = 5, fill = "seagreen", color = "black", na.rm = TRUE) +
+  labs(title = "Distribution of Houses by Year Built", 
+       x = "Year Built", 
+       y = "Count of Houses")
+
+ggplot(data = ames, aes(x = YearBuilt, y = `Sale Price`)) +
+  geom_point(alpha = 0.3, color = "blue", na.rm = TRUE) +
+  labs(title = "Sale Price vs Year Built",
+       x = "Year Built",
+       y = "Sale Price ($)")
+```
+
+> Answer: The variable YearBuilt ranges from the year 0 (which is likely a data error) to 2022. The median build year is 1978, meaning half the houses were built after that. There are also 447 houses missing this data. The scatterplot shows that newer houses generally sell for higher prices. This helps explain the extreme house prices because the multi-million dollar luxury homes were almost all built after the year 2000.
+
+# Homework Assignment
+
+## Chick Weights
+
+The `ChickWeight` data set is part of the base package `datasets`. See `?ChickWeight` for details on the data. For all of the questions use `dplyr` functions whenever possible.
+
+1.  Download the RMarkdown file with these homework instructions to use as a template for your work. Make sure to replace "Your Name" in the YAML with your name. To get full points, show your R code (in a code chunk) and write answers to the questions.
+
+2.  What variables are part of the dataset?
+
+```{r}
+str(ChickWeight)
+```
+
+> Answer: The dataset has 4 variables: weight (the weight of the bird in grams), Time (the number of days since birth), Chick (the unique ID number for each bird), and Diet (the food group number from 1 to 4).
+
+3.  Get a frequency breakdown of the number of chicks, their average weight and the standard deviation of the weights in each of the diets at the start of the study.
+
+- extra credit: construct a ggplot that shows average weights by diet with an interval (shown as a line) of +- the standard deviation around the averages. (Hint: read this article regarding [ggplot error bars](http://www.sthda.com/english/wiki/ggplot2-error-bars-quick-start-guide-r-software-and-data-visualization))
+
+```{r}
+diet_summary <- ChickWeight %>%
+  filter(Time == 0) %>%
+  group_by(Diet) %>%
+  summarize(
+    num_chicks = n(),
+    avg_weight = mean(weight, na.rm = TRUE),
+    sd_weight = sd(weight, na.rm = TRUE)
+  )
+print(diet_summary)
+
+# Extra Credit
+ggplot(diet_summary, aes(x = Diet, y = avg_weight, fill = Diet)) +
+  geom_bar(stat = "identity", position = "dodge", alpha = 0.7) +
+  geom_errorbar(aes(ymin = avg_weight - sd_weight, ymax = avg_weight + sd_weight), width = 0.2) +
+  labs(title = "Average Day 0 Weight by Diet with SD Error Bars",
+       y = "Average Weight (g)")
+```
+
+> Answer: On Day 0, Diet 1 has 20 chicks, while Diets 2, 3, and 4 have 10 chicks each. All groups start with a very similar average weight of around 41 grams. The standard deviations are small (around 1 gram), which means the chicks are all almost the exact same size at the start of the study.
+
+4.  Each chick should have twelve weight measurements. Use the `dplyr` package to identify how many chicks have a complete set of weight measurements and how many measurements there are on average in the incomplete cases. Extract a subset of the data for all chicks with complete information and name the data set `complete`. (Hint: you might want to use mutate to introduce a helper variable consisting of the number of observations)
+
+```{r}
+chick_counts <- ChickWeight %>%
+  group_by(Chick) %>%
+  summarize(num_measures = n(), Diet = first(Diet))
+
+completeness_summary <- chick_counts %>%
+  summarize(
+    complete_chicks = sum(num_measures == 12),
+    incomplete_chicks = sum(num_measures < 12),
+    avg_measures_incomplete = mean(num_measures[num_measures < 12])
+  )
+print(completeness_summary)
+
+complete_chicks_list <- chick_counts %>% 
+  filter(num_measures == 12) %>% 
+  pull(Chick)
+
+complete <- ChickWeight %>% 
+  filter(Chick %in% complete_chicks_list)
+```
+
+> Answer: There are 45 chicks that have a complete set of 12 weight measurements. There are 5 chicks with incomplete data, and they have an average of 7.6 measurements before dropping out. The complete records are now saved in a new dataset named complete.
+
+5.  In the complete data set introduce a new variable that measures the current weight difference compared to day 0. Name this variable `weightgain`. (Hint: use mutate and `?mutate` to check the parameter `.by`. This parameter can create a temporary `group_by` so that we can do calculation in each subgroup, i.e. for each combination of chick and diet, `weight - min(weight)`)
+
+```{r}
+complete <- complete %>%
+  mutate(weightgain = weight - min(weight), .by = c(Chick, Diet))
+
+head(complete)
+```
+
+> Answer: The new column weightgain has been added successfully. It subtracts the starting Day 0 weight from the current weight for each chick. It correctly starts at 0 on the first day.
+
+6.  Use `ggplot2` to create side-by-side boxplots of `weightgain` by `Diet` for day 21. Describe the relationship in 2-3 sentences. Change the order of the categories in the Diet variable such that the boxplots are ordered by median `weightgain`.
+
+```{r}
+day21_data <- complete %>% filter(Time == 21)
+
+day21_data <- day21_data %>%
+  mutate(Diet = reorder(Diet, weightgain, FUN = median))
+
+ggplot(data = day21_data, aes(x = Diet, y = weightgain, fill = Diet)) +
+  geom_boxplot() +
+  labs(title = "Weight Gain by Diet Category on Day 21 (Ordered by Median)",
+       x = "Diet Feed Category",
+       y = "Weight Gain (g)")
+```
+
+> Answer: The boxplots show that the type of diet changes how much weight the chicks gain by day 21. Diet 3 has the highest median weight gain, while Diet 1 has the lowest weight gain. Ordering the categories by their middle value makes it easy to see that Diet 3 is the most effective food.
+
+Note: Your submission is supposed to be fully reproducible, i.e. the TA and I will 'knit' your submission in RStudio.
+
+For the submission: submit your solution in an R Markdown file and (just for insurance) submit the corresponding html (or Word) file with it.
+
+(Optional but encouraged):\
+If you’d like to practice using GitHub, feel free to push your `.Rmd` and knitted `.html` file to a **public GitHub repository** under your own account. If you do, paste the link to your GitHub repo below:
+
+> GitHub repo link (optional): `https://github.com/fionithakker28/ds2020-fioni`
